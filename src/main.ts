@@ -4,7 +4,7 @@ import { config, LICENCE } from "./utils/consts.js";
 export const app = exp();
 import { server } from "./modules/sockets.js";
 import { getLicence, getTemplate } from "./utils/template.js";
-const proxy = new server(config.proxy.port);
+const proxy = new server();
 //This is here to insure the LICENCE file is not excluded
 if (!LICENCE.exists() || !LICENCE.sha1("b4d7662bb6b0b804c8fc94f7bc81f59dce0c36f3")) {
     console.error("Cannot validate licence")
