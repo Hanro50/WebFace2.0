@@ -20,9 +20,12 @@ Created by Hanro50.
 Github Link: https://github.com/Hanro50
 Prefered if contacted via github
 
-If you have found this project helpful in the slightest bit of capacity and would wish me to continue to expand upon it in the future. Please consider donating at https://paypal.me/Hanro50. These donations make it possible to keep this project alive. 
+If you have found this project helpful in the slightest bit of capacity and would wish me to continue to expand upon it in the future. 
+Please consider donating at https://paypal.me/Hanro50. These donations make it possible to keep this project alive. 
 
 Please note:
-As the project stands. The main maintenance interface should not be exposed to the web. This is mainly due to the lack of any tangable protection preventing an attacker from gaining access to it. You have been warned. 
+As the project stands. The main maintenance interface should not be exposed to the web. 
+This is mainly due to the lack of any tangable protection preventing an attacker from gaining access to it. 
+You have been warned. 
 
 This notice is subject to updates by the main maintainer. 
