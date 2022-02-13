@@ -2,7 +2,6 @@ import { root } from "../utils/consts.js";
 import { Express, Router } from "express";
 import proxy from "express-http-proxy";
 import exp from "express";
-import { file } from "../utils/files.js";
 import { getLicence, getTemplate } from "../utils/template.js";
 export const dataFile = root.getFile("sockets.json");
 export let data: Map<string, dns> = new Map();
