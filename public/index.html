@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A Maintenance panel for a proxy network">
+    <title>Maintenance interface</title>
+    <style>
+        html {
+            width: 100%;
+            height: 100%
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+        }
+        body {
+            background-color: #171717;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <iframe id="content" frameborder="0" importance="high" title="Content window">
+        Need iframe support!
+    </iframe>
+    <script type="module">
+        console.log("Loaded")
+        const r = await fetch("/css/index.css");
+        const content = await r.text();
+        /**@type {HTMLIFrameElement}*/
+        const iframe = document.getElementById("content");
+        iframe.onload = () => {
+            const link = document.createElement("style");
+            link.innerHTML = content;
+            iframe.contentDocument.body.style.display = "none";
+            iframe.contentDocument.head.appendChild(link);
+            setTimeout(() => {
+                iframe.contentDocument.body.style.display = "";
+            }, 0.1);
+        }
+        window.onload = iframe.onload;
+        setTimeout(() => {
+            iframe.src = "/pages/nav.html";
+        }, 0.0001);
+    </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<style>
+    table {
+        width: calc(90% + 3px);
+        border: 1px solid white;
+        justify-content: space-evenly;
+    }
+
+    tr {
+        width: calc(90% + 3px / 3);
+    }
+
+    td,
+    th {
+        border: 1px solid white;
+
+    }
+
+    td div,
+    th div {
+        width: 100%;
+        background-color: transparent;
+        color: white;
+        padding-top: 5px;
+        margin-left: 3px;
+        width: calc(100% - 6px) !important;
+        padding-bottom: 5px;
+    }
+
+    div * {
+        background-color: transparent;
+        color: white;
+        width: 100% !important;
+    }
+
+    .b {
+        text-align: center;
+        cursor: pointer;
+        transition: 0.5s;
+
+    }
+
+    .b:hover {
+        background-color: white;
+        color: black;
+    }
+
+    .b * {
+        color: inherit;
+        margin: 0 !important;
+        padding-left: 0;
+        padding-right: 0;
+        font-size: medium;
+        cursor: pointer;
+    }
+
+    p {
+        margin: 0;
+    }
+
+    input,
+    input:focus {
+        outline: none;
+        border: none;
+
+    }
+</style>
+</head>
+<body>
+    <h1>Socket manager</h1>
+    <hr>
+    <div class="button" onclick="window.location.href='./nav.html'">Back</div>
+
+    <table id="table">
+        <tr>
+            <th>
+                <div>DNS Address</div>
+            </th>
+            <th>
+                <div>Links to</div>
+            </th>
+            <th>
+                <div>Settings</div>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div><input id="domain" placeholder="DNS Address"></input></div>
+            </td>
+            <td>
+                <div><input id="redirect" placeholder="IP to redirect to"></input></div>
+            </td>
+            <td class="b">
+                <div><input type="submit" onclick="submit()"></input></div>
+            </td>
+        </tr>
+
+    </table>
+    <script>
+
+        async function submit() {
+            const domain = document.getElementById("domain").value;
+            const redirect = document.getElementById("redirect").value;
+            console.log(domain, redirect);
+            document.body.innerText = "Posting data...";
+
+            const r = await fetch("/api/ports/add", { method: "post", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ domain, redirect }) });
+            if (r.ok)
+                alert("Data has been posted without issue");
+            else alert("Error!\nCould not post data");
+            window.location.reload();
+        }
+    </script>
+    <script type="module">
+        const table = document.getElementById("table")
+        const r = await fetch("/api/ports/list");
+        /**@type {Map<string, {domain: string,
+    redirect: string,cloudflare?: boolean,open?: boolean,name?: string}>} */
+        const data = new Map();
+        (await r.json()).forEach(element => data.set(element.domain, element));
+        data.forEach(v => {
+            console.log(v)
+            const tr = document.createElement("tr");
+            const td1 = document.createElement("td");
+            td1.innerText = v.domain;
+            td1.innerHTML = "<div>" + td1.innerText + "</div>"
+            tr.appendChild(td1);
+            const td2 = document.createElement("td");
+            td2.innerText = v.redirect;
+            td2.innerHTML = "<div>" + td2.innerText + "</div>"
+            tr.appendChild(td2);
+            const td3 = document.createElement("td");
+            td3.innerHTML = "<div>Edit</div>"
+            td3.className = "b";
+            td3.onclick = () => window.location = "./editor.html?domain=" + v.domain;
+            tr.appendChild(td3);
+            if (v.cloudflare) {
+                td1.style.border = "1px solid orange";
+                td2.style.border = "1px solid orange";
+                td3.style.border = "1px solid orange";
+            }
+            table.appendChild(tr)
+        })
+    </script>
+</body>
+
+</html>

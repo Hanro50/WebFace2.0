@@ -1,0 +1,48 @@
+@keyframes fade_in_page {
+    0% {
+        opacity: 0;
+    }
+    
+    100% {
+        opacity: 1;
+       size: 1;
+    }
+}
+body{
+    background-color: #171717;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: azure;
+    animation-duration: 0.5s;
+    animation-delay: 0s;
+    animation-name: fade_in_page;
+    font-family: sans-serif;
+}
+h1{
+    font-size: xx-large;
+    font-weight: bold;
+}
+hr{
+    width: 95%;
+}
+.button:hover{
+    background-color: #202020;
+}
+
+.button{
+    transition-duration: 0.5s;
+    background-color: #272727;
+    width: 80%;
+    margin-bottom: 10px;
+    display: flex;
+    cursor: pointer;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: large;
+    font-style: bold;
+    font-weight: bold;
+    border: 2px solid #202020;
+    transition:  all 0s,background-color 0.5s !important;
+}

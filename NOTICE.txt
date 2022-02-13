@@ -1,0 +1,28 @@
+﻿WebFace 2.0 Copyright (C) 2022  Hanro50
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+WebFace 2.0 Notice file:
+
+Created by Hanro50. 
+
+Github Link: https://github.com/Hanro50
+Prefered if contacted via github
+
+If you have found this project helpful in the slightest bit of capacity and would wish me to continue to expand upon it in the future. Please consider donating at https://paypal.me/Hanro50. These donations make it possible to keep this project alive. 
+
+Please note:
+As the project stands. The main maintenance interface should not be exposed to the web. This is mainly due to the lack of any tangable protection preventing an attacker from gaining access to it. You have been warned. 
+
+This notice is subject to updates by the main maintainer. 
