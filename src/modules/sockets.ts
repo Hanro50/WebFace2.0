@@ -20,18 +20,18 @@ interface dns {
 export class server {
     app: http.Server;
     router: Router;
-    port: number;
-    protocol: string;
-    clientProtocal: string;
     constructor() {
-        this.port = config.proxy.port;
-        this.clientProtocal = config.proxy.clientProtocal || "http://";
-        const self = this;
+        if (config.https) {
+            console.log("HTTPS server redirects active on port " + config.https.port)
+            const SSLproxy = ((req: http.IncomingMessage, res: http.ServerResponse) => this.proxy(req, res, config.https.port, "https"))
+            this.app = https.createServer(config.https, SSLproxy).listen(config.https.port);
+        }
+        if (config.http) {
+            console.log("HTTP server redirects active on port " + config.http.port)
+            const Nrmproxy = ((req: http.IncomingMessage, res: http.ServerResponse) => this.proxy(req, res, config.http.port, "http"))
+            this.app = http.createServer(Nrmproxy).listen(config.http.port);
 
-        //Needs to be wrapped as the 'this' keyword is overwritten by the http server
-        const p = ((req: http.IncomingMessage, res: http.ServerResponse) => this.proxy(req, res, self))
-        if (config.https) { this.protocol = "https"; this.app = https.createServer(config.https, p).listen(this.port); }
-        else { this.protocol = "http"; this.app = http.createServer(p).listen(this.port); }
+        }
 
         //The maintenance endpoints
         this.router = Router();
@@ -98,11 +98,14 @@ export class server {
         return r;
     }
     //Uses the native http client to make it faster.
-    proxy(client_req: IncomingMessage, client_res: ServerResponse, self: server) {
+    proxy(client_req: IncomingMessage, client_res: ServerResponse, port: number, protocol: string) {
+        console.log("Hello")
         async function p(host: string): Promise<void> {
+            console.log("Hello")
             const result = data.get(host);
             if (result != null) {
-                const url = new URL((result.redirect.includes("://") ? "" : self.clientProtocal) + result.redirect);
+                const url = new URL((result.redirect.includes("://") ? "" : protocol+"://") + result.redirect);
+                console.log(url)
                 var options: http.RequestOptions = {
                     hostname: url.hostname,
                     port: url.port,
@@ -120,14 +123,14 @@ export class server {
                     end: true
                 });
 
-            } else if (host.endsWith(String(":" + self.port))) {
-                return p(host.substring(0, host.length - (":" + self.port).length))
+            } else if (host.endsWith(String(":" + port))) {
+                return p(host.substring(0, host.length - (":" + port).length))
             } else if (client_req.url == "/LICENCE") {
                 const d = getLicence();
                 client_res.writeHead(200, { 'Content-Length': Buffer.byteLength(d), "content-type": "text/html" }).end(d);
             } else {
                 let links = "";
-                data.forEach((v, k) => { if (v.name && v.open) links += `<a href="${self.protocol}://${k}">${v.name}</a>` });
+                data.forEach((v, k) => { if (v.name && v.open) links += `<a href="${protocol}://${k}">${v.name}</a>` });
                 links += `<a href="/LICENCE">LICENCE</a>`;
                 const d = getTemplate("Error 404", "Error 404: Cannot find resource", links);
                 client_res.writeHead(404, { 'Content-Length': Buffer.byteLength(d), "content-type": "text/html" }).end(d);

@@ -12,16 +12,12 @@
       "moduleResolution": "Node",
       "resolveJsonModule": true,
       "target": "ESNext",
-      // Generate d.ts files
       "allowJs": true,
       "allowSyntheticDefaultImports": true,
       "importHelpers": true,
       "esModuleInterop": true,
-      // Types should go into this directory.
-      // Removing this would place the .d.ts files
-      // next to the .js files
       "removeComments": true,
-    //  "sourceMap": true,
-      "rootDir": "src/"
+      "rootDir": "src/",
+      "watch": true
     }
   }
