@@ -8,9 +8,13 @@
        size: 1;
     }
 }
+html{
+    height: 100%;
+}
 body{
     background-color: #171717;
     display: flex;
+    height: calc(100% - 16px);
     flex-direction: column;
     align-items: center;
     color: azure;

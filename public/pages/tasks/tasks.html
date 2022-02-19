@@ -2,12 +2,109 @@
 <html>
 
 <head>
+    <link rel="stylesheet" href="/xterm/css/xterm.css" />
+    <script src="/xterm/lib/xterm.js"></script>
+    <script src="/scripts/ansi-to-html.js"></script>
+    <style>
+        #terminal {
+
+            overflow-y: scroll;
+
+            font-family: monospace;
+            flex: 1;
+
+            max-height: 100%;
+        }
+
+        #holder {
+            overflow-y: overlay;
+            display: flex;
+            width: 90%;
+            flex: 1;
+            padding: 10px;
+            border-radius: 20px;
+            flex-grow: 1;
+            background-color: #101010;
+        }
+
+        /* width */
+        #terminal::-webkit-scrollbar {
+            width: 10px;
+            border-radius: 20px;
+            padding-top: 20px;
+        }
+
+        /* Track */
+        #terminal ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        /* Handle */
+        #terminal::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 20px;
+        }
+
+        /* Handle on hover */
+        #terminal::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        body {
+            max-height: calc(100vh - 16px);
+        }
+
+        table {
+            width: 90%;
+        }
+
+        tr {
+            display: flex;
+            justify-content: center;
+        }
+
+        td {
+            width: calc(100% / 3.1);
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .error {
+            color: red;
+            font-weight: bolder;
+        }
+
+        .connected {
+            color: lawngreen;
+            font-weight: bolder;
+        }
+    </style>
 </head>
 
 <body>
     <h1>Task manager</h1>
     <hr>
-    <div class="button" onclick="window.location.href='./nav.html'">Back</div>
+    <table>
+        <tr>
+            <td>
+                <div class="button" onclick="window.location.href='../nav.html'">Back</div>
+            </td>
+            <td>
+                <div class="button" onclick="window.location.href='../nav.html'">Clear</div>
+            </td>
+            <td>
+                <div class="button" onclick="window.location.href='../nav.html'">Terminate</div>
+            </td>
+        </tr>
+    </table>
+
+    <div id="holder">
+        <div id="terminal">Loading...</div>
+    </div>
+
+
+    <script src="/scripts/taskmon.js"></script>
 </body>
 
 </html>

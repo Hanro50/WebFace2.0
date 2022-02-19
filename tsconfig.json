@@ -18,6 +18,7 @@
       "esModuleInterop": true,
       "removeComments": true,
       "rootDir": "src/",
-      "watch": true
+      "watch": true,
+      "module": "esnext"
     }
   }

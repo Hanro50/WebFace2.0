@@ -1,4 +1,3 @@
-
 import { join } from "path";
 import { existsSync, mkdirSync, unlinkSync, symlinkSync, readFileSync, createWriteStream, statSync, writeFileSync, read, rmSync, readdirSync, copyFileSync, lstatSync } from 'fs';
 import { createHash } from "crypto";
@@ -19,7 +18,6 @@ export function mklink(target: string, path: string) {
     }
 }
 
-
 export function mkdir(path: string) {
     if (!existsSync(path)) mkdirSync(path, { recursive: true, });
 }
@@ -28,6 +26,7 @@ export function stringify(json: object) {
     //@ts-ignore
     return JSON.stringify(json, "\n", "\t");
 }
+
 const isWin = platform() == "win32";
 
 export class dir {
@@ -36,14 +35,12 @@ export class dir {
         if (isWin) return !this.path[0].includes(":");
         return !this.path[0].startsWith("/");
     }
-
     islink() {
         return lstatSync(this.sysPath()).isSymbolicLink();
     }
     path: string[];
     constructor(...path: string[]) {
         this.path = [];
-
         if (!isWin && path[0].startsWith("/")) {
             this.path.push("/")
         }
@@ -55,8 +52,6 @@ export class dir {
         this.path = this.path.filter((el) => {
             return el.length > 0;
         })
-
-
     }
     sysPath() {
         if (this.isRelative()) {
@@ -99,7 +94,6 @@ export class dir {
         return this.path.join("/");
     }
     ls() {
-
         let res: Array<dir | file> = [];
         if (this.exists()) {
             readdirSync(this.sysPath()).forEach(e => {
@@ -125,7 +119,6 @@ export class file extends dir {
         super(...path);
         this.name = this.path.pop();
     }
-
     read(): string {
         return readFileSync(this.sysPath()).toString();
     }
@@ -188,12 +181,10 @@ export class file extends dir {
 
         return false;
     }
-
     chmod() {
         if (type() != "Windows_NT")
             execSync('chmod +x ' + this.sysPath())
     }
-
     write(data: string | ArrayBuffer | object) {
         if (typeof data == "object")
             data = stringify(data);

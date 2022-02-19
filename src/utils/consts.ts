@@ -8,13 +8,15 @@ if (!settingsFile.exists()) {
 export const config = settingsFile.toJSON<settings>();
 interface settings {
     https?: ServerOptions & {
-        port: number
+        port: number,
+        passThrough?: boolean
     },
     http?: {
         port: number
     }
     main: { port: number, password?: string }
     cloudflare?: string
+    logLimit?: number;
     //noInsecure being set to true will disable the vanilla http server
 
 }

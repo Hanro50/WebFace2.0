@@ -5,10 +5,11 @@ export const dataFile = root.getFile("sockets.json");
 export let data: Map<string, dns> = new Map();
 if (dataFile.exists()) dataFile.toJSON<dns[]>().forEach(element => data.set(element.domain, element));
 dataFile.exists() ? new Map(dataFile.toJSON()) : new Map();
+import HttpProxy from 'http-proxy';
 
+const ports: Map<String, HttpProxy> = new Map();
 import http, { IncomingMessage, ServerResponse } from "http";
 import https from "https";
-
 interface dns {
     domain: string,
     redirect: string,
@@ -16,21 +17,38 @@ interface dns {
     open?: boolean,
     name?: string
 }
-
 export class server {
-    app: http.Server;
-    router: Router;
+    router: Router;//
+    wrap(server: http.Server, port: Number, protocol: string) {
+        server.on("upgrade", function (req, socket, head) {
+            let proxy = ports.get(req.headers.origin);
+            const host = req.headers.host;
+            let result = data.get(req.headers.host);
+
+            if (result == null && host.endsWith(String(":" + port))) result = data.get(host.substring(0, host.length - (":" + port).length));
+            if (result == null) return socket.end()
+            if (proxy == null) {
+                console.log("proxying upgrade request", req.url);
+                proxy = HttpProxy.createProxyServer({ target: (result.redirect.includes("://") ? "" : protocol + "://") + result.redirect, ws: true })
+                ports.set(req.headers.origin, proxy);
+            }
+            proxy.ws(req, socket, head);
+        });
+    }
+
+    proxyFunc(port: number, protocal: string) {
+        return ((req: http.IncomingMessage, res: http.ServerResponse) => this.proxy(req, res, port, protocal))
+    }
     constructor() {
         if (config.https) {
             console.log("HTTPS server redirects active on port " + config.https.port)
-            const SSLproxy = ((req: http.IncomingMessage, res: http.ServerResponse) => this.proxy(req, res, config.https.port, "https"))
-            this.app = https.createServer(config.https, SSLproxy).listen(config.https.port);
+            const app = https.createServer(config.https, this.proxyFunc(config.https.port, config.https.passThrough ? "https" : "http")).listen(config.https.port);
+            this.wrap(app, config.https.port, config.https.passThrough ? "https" : "http");
         }
         if (config.http) {
             console.log("HTTP server redirects active on port " + config.http.port)
-            const Nrmproxy = ((req: http.IncomingMessage, res: http.ServerResponse) => this.proxy(req, res, config.http.port, "http"))
-            this.app = http.createServer(Nrmproxy).listen(config.http.port);
-
+            const app = http.createServer(this.proxyFunc(config.http.port, "http")).listen(config.http.port);
+            this.wrap(app, config.http.port, "http");
         }
 
         //The maintenance endpoints
@@ -99,13 +117,10 @@ export class server {
     }
     //Uses the native http client to make it faster.
     proxy(client_req: IncomingMessage, client_res: ServerResponse, port: number, protocol: string) {
-        console.log("Hello")
         async function p(host: string): Promise<void> {
-            console.log("Hello")
             const result = data.get(host);
             if (result != null) {
-                const url = new URL((result.redirect.includes("://") ? "" : protocol+"://") + result.redirect);
-                console.log(url)
+                const url = new URL((result.redirect.includes("://") ? "" : protocol + "://") + result.redirect);
                 var options: http.RequestOptions = {
                     hostname: url.hostname,
                     port: url.port,
@@ -122,7 +137,6 @@ export class server {
                 client_req.pipe(Fproxy, {
                     end: true
                 });
-
             } else if (host.endsWith(String(":" + port))) {
                 return p(host.substring(0, host.length - (":" + port).length))
             } else if (client_req.url == "/LICENCE") {
