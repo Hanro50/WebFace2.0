@@ -29,20 +29,25 @@
 
         /* width */
         #terminal::-webkit-scrollbar {
-            width: 10px;
             border-radius: 20px;
-            padding-top: 20px;
+            max-width: 10px;
         }
 
         /* Track */
         #terminal ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: #101010;
         }
 
         /* Handle */
         #terminal::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 20px;
+        }
+
+        #terminal::-webkit-scrollbar-corner,
+        #terminal::-webkit-scrollbar-button {
+            display: none;
+            background: #101010;
         }
 
         /* Handle on hover */
@@ -64,7 +69,7 @@
         }
 
         td {
-            width: calc(100% / 3.1);
+            width: calc(100% / 2.1);
             display: inline-flex;
             justify-content: center;
             align-items: center;
@@ -79,31 +84,48 @@
             color: lawngreen;
             font-weight: bolder;
         }
+
+        h1 {
+            margin-bottom: 0;
+        }
+
+        #nav {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            width: 90%;
+
+        }
+
+        #nav * {
+            min-width: 13ch;
+            flex: 1;
+            margin: 5px;
+            width: calc(100% / 3);
+        }
     </style>
 </head>
 
 <body>
-    <h1>Task manager</h1>
+    <h1>Task manager:</h1>
+    <div id="task">Loading...</div>
     <hr>
-    <table>
-        <tr>
-            <td>
-                <div class="button" onclick="window.location.href='../nav.html'">Back</div>
-            </td>
-            <td>
-                <div class="button" onclick="window.location.href='../nav.html'">Clear</div>
-            </td>
-            <td>
-                <div class="button" onclick="window.location.href='../nav.html'">Terminate</div>
-            </td>
-        </tr>
-    </table>
+    <div id="nav">
+        <div class="button" onclick="window.location.href='../nav.html'">Back</div>
 
+        <div class="button" onclick="window.location.href='../nav.html'">Service&nbsp;select</div>
+
+        <div class="button" onclick="window.location.reload()">Refresh</div>
+
+        <div class="button" onclick="taskmon.disconnect();">Disconnect</div>
+
+        <div class="button" onclick="taskmon.clear();">Clear</div>
+
+        <div class="button" onclick="taskmon.terminate();">Terminate</div>
+    </div>
     <div id="holder">
         <div id="terminal">Loading...</div>
     </div>
-
-
     <script src="/scripts/taskmon.js"></script>
 </body>
 

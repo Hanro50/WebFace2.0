@@ -1,4 +1,4 @@
-import {  Router } from "express";
+import { Router } from "express";
 import { app, ws } from "../main.js";
 import { config } from "../utils/consts.js";
 
@@ -7,7 +7,33 @@ app.use("/api/logs", log_router);
 console.log("Setting up logs!")
 ws.app.ws('/', function (ws, req) {
     ws.on('message', function (msg) {
-        ws.send(msg);
+        try {
+            const mess = JSON.parse(msg.toString()) as { task: string, data: string };
+            const task = tasks.get(mess.data || "main");
+            if (task != null)
+                switch (mess.task) {
+                    case "refresh":
+                        task.data.forEach((v) => {
+                            this.send(JSON.stringify(v));
+                        })
+                        break;
+                    case "clear":
+                        task.data = [];
+                        break;
+                    case "kill":
+                        if (mess.data || "main" == "main") {
+                            this.send(JSON.stringify({ target: mess.data, message: "I'm not handing you a Darwin award...\n\x1b[1;31mAccess denied: Kicking client due to violation!", type: "error" }));
+                            this.close();
+                        }
+                        else this.send(JSON.stringify({ target: mess.data, message: "Not implemented yet :(", type: "error" }));
+                        break;
+                    default:
+                        this.send(JSON.stringify({ target: mess.data, message: "Error: Unknown command!", type: "error" }));
+                }
+        } catch {
+
+        }
+        console.log(msg)
     });
 });
 
@@ -18,7 +44,7 @@ interface task {
 const tasks: Map<string, task> = new Map();
 tasks.set("main", { data: [] });
 const logLimit = config.logLimit || 10000;
-log_router.get("/lists", (req, res) => {
+log_router.get("/terminate", (req, res) => {
     const task = tasks.get(req.query.task as string || "main")
     if (task == null) res.status(404).type("json").send(JSON.stringify({ error: "data not found" })).end();
     else res.type("json").send(task.data).end();
@@ -56,4 +82,3 @@ process.stderr.write = (...args: any) => {
 
 console.log("Logs are set up!")
 
-setInterval(() => console.log("tick"), 1000);
