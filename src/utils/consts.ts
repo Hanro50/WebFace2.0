@@ -22,8 +22,8 @@ interface settings {
 }
 export const LICENCE = new file("LICENSE");
 
-interface setting {
-    supported?: boolean
+export interface sysSettings {
+    supported: boolean
     //name of the script file
     file?: string;
     //wether this needs to be an account with administrative rights. 
@@ -42,5 +42,5 @@ export interface script {
     //a short discription
     description?: string;
     //platform specific settings
-    settings: { [key in "windows" | "darwin" | "linux"]?: setting } | setting;
+    settings: { [key in "windows" | "darwin" | "linux"]?: sysSettings } | sysSettings;
 };
