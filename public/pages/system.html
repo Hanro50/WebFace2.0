@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+    <h1>Edit services</h1>
+    <hr>
+    <div class="button" onclick="window.location.href='./nav.html'">Back</div>
+    <script type="module">
+        function button(text, subtext, func) {
+            const div = document.createElement("div");
+            div.title = subtext;
+            div.classList = "button";
+            div.onclick = func;
+            div.innerHTML = `${text} <br><h6>${subtext}</h6>`;
+            document.body.appendChild(div);
+            return div;
+        }
+
+        const r = await fetch("/api/scripts/system/list");
+        const json = await r.json();
+        json.forEach(e => {
+            button(e.name, e.description, () => { })
+        });
+
+    </script>
+</body>
+
+</html>

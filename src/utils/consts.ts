@@ -21,3 +21,26 @@ interface settings {
 
 }
 export const LICENCE = new file("LICENSE");
+
+interface setting {
+    supported?: boolean
+    //name of the script file
+    file?: string;
+    //wether this needs to be an account with administrative rights. 
+    root?: boolean;
+    commands?: [string];
+}
+export interface script {
+    //name of the script
+    name: string;
+    //wether it should be registered as a system script
+    system?: boolean;
+    //wether it should run at startup
+    startup?: boolean;
+    //wether this script should restart on a crash
+    autorestart?: boolean;
+    //a short discription
+    description?: string;
+    //platform specific settings
+    settings: { [key in "windows" | "darwin" | "linux"]?: setting } | setting;
+};

@@ -44,11 +44,7 @@ interface task {
 const tasks: Map<string, task> = new Map();
 tasks.set("main", { data: [] });
 const logLimit = config.logLimit || 10000;
-log_router.get("/terminate", (req, res) => {
-    const task = tasks.get(req.query.task as string || "main")
-    if (task == null) res.status(404).type("json").send(JSON.stringify({ error: "data not found" })).end();
-    else res.type("json").send(task.data).end();
-})
+log_router.get("/list", (req, res) => res.type("json").send(JSON.stringify(Array.from(tasks.keys()))).end());
 
 function broadcast(target: string, message: string, type: "error" | "info") {
 

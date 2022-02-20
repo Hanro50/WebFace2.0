@@ -1,0 +1,24 @@
+{
+    "name": "Update system",
+    "system": true,
+    "description":"Updates the running operating system",
+    "settings": {
+        "windows": {
+            "root": true,
+            "supported": true,
+            "commands": [
+                "usoclient startscan",
+                "usoclient startdownload",
+                "usoclient startinstall"
+            ]
+        },
+        "darwin": {
+            "supported": false
+        },
+        "linux": {
+            "root": true,
+            "supported": true,
+            "file": "update.sh"
+        }
+    }
+}
