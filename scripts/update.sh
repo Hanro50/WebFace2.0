@@ -8,7 +8,7 @@ if [ -f "$APT" ];
 then
     echo updating debian/ubuntu.
     apt update
-    apt upgrade
+    apt upgrade -y
 elif [ -f "$PACMAN" ];
 then
     echo updating arch.
@@ -17,12 +17,12 @@ elif [ -f "$DNF" ];
 then
     echo updating Fedora/CentOS/RedHat.
     dnf update
-    dnf upgrade
+    dnf upgrade -y
 elif [ -f "$PKG" ];
 then
     echo updating Freebsd?
     pkg update
-    pkg upgrade
+    pkg upgrade -y
 else 
     echo Unsupported system detected.
 fi

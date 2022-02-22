@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <link rel="stylesheet" href="/css/table.css">
 </head>
 
 <body>
@@ -9,6 +10,98 @@
     <hr>
     <div class="button" onclick="window.location.href='./list.html'">Back</div>
 
+    <table id="table">
+        <tr>
+            <th>
+                <div>DNS Address</div>
+            </th>
+            <th>
+                <div>Settings</div>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div>Name</div>
+            </td>
+            <td>
+                <div><input></input></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div>Excution path</div>
+            </td>
+            <td>
+                <div><input></input></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div>Start at Startup</div>
+            </td>
+            <td>
+                <div><input type="checkbox"></input></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div>Run as root</div>
+            </td>
+            <td>
+                <div><input type="checkbox"></input></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div>Advance mode</div>
+            </td>
+            <td>
+                <div><input type="checkbox"></input></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div>Description</div>
+            </td>
+            <td>
+                <div><textarea></textarea></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div>Basic script</div>
+            </td>
+            <td>
+                <div><textarea></textarea></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div>Advance script</div>
+            </td>
+             <td class="b">
+                <div>Select file (no file selected)</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div>Save changes</div>
+            </td>
+            <td class="b">
+                <div>Save</div>
+            </td>
+        </tr>
+    </table>
+    <script>
+        Array.from(document.getElementsByTagName("div")).forEach(element => {
+            const e = element.firstElementChild;
+            if (e instanceof HTMLInputElement && e.type == "checkbox") {
+                (element.parentElement || element).onclick = () => e.click();
+                e.style.pointerEvents = "none";
+            }
+        });
+
+    </script>
 </body>
 
 </html>

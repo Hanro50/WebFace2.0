@@ -1,0 +1,72 @@
+table {
+    width: calc(90% + 3px);
+    border: 1px solid white;
+    justify-content: space-evenly;
+}
+
+tr {
+    width: calc(90% + 3px / 3);
+}
+
+td,
+th {
+    border: 1px solid white;
+
+}
+
+td div,
+th div {
+    width: 100%;
+    background-color: transparent;
+    color: white;
+    padding-top: 5px;
+    margin-left: 3px;
+    width: calc(100% - 6px) !important;
+    padding-bottom: 5px;
+}
+
+div * {
+    background-color: transparent;
+    color: white;
+    width: 100% !important;
+}
+
+.b {
+    text-align: center;
+    cursor: pointer;
+    transition: 0.5s;
+
+}
+
+.b:hover {
+    background-color: white;
+    color: black;
+}
+
+.b * {
+    color: inherit;
+    margin: 0 !important;
+    padding-left: 0;
+    padding-right: 0;
+    font-size: medium;
+    cursor: pointer;
+}
+
+p {
+    margin: 0;
+}
+
+input,
+textarea,
+textarea:focus
+input:focus {
+    outline: none;
+    border: none;
+
+}
+
+textarea{
+    height: 135px;
+    border: none;
+    resize: none;
+}
