@@ -28,7 +28,10 @@ export interface sysSettings {
     file?: string;
     //wether this needs to be an account with administrative rights. 
     root?: boolean;
+    //The commands that need to be ran 
     commands?: [string];
+    //The active working directory - defaults to script folder
+    pwd?: [string];
 }
 export interface script {
     //name of the script

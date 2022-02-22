@@ -1,8 +1,8 @@
-import { execFileSync } from "child_process";
 import e, { Router } from "express";
 import { app, ws } from "../main.js";
 import { script, sysSettings } from "../utils/consts.js";
 import { dir, file } from "../utils/files.js";
+import { spawn,execSync, execFileSync } from "child_process";
 const script_folder = new dir("./scripts")
 const script_router = Router();
 app.use("/api/scripts", script_router);
@@ -63,30 +63,45 @@ script_router.post("/run", (req, res) => {
         return res.status(500).type("json").send(JSON.stringify({ error: "Failed to parse script data" })).end();
     }
     const result = run(scriptINI);
-    if ("error" in result) return res.status(result.code).type("json").send(JSON.stringify({ error: result.error })).end();
+    console.log(result)
+    if (result && "error" in result) return res.status(result.code).type("json").send(JSON.stringify({ error: result.error })).end();
 
 
     res.status(200).end();
 })
 
 function run(script: script): { error: string, code: number } {
+    console.log("Running ",script)
     let sys: sysSettings;
-
+    let system: "windows" | "darwin" | "linux";
+    switch (process.platform) {
+        case ("win32"): system = "windows"; break;
+        case ("darwin"): system = "darwin"; break;
+        default: system = "linux";
+    }
     if ("supported" in script.settings) {
         sys = script.settings;
     } else {
-        let system: "windows" | "darwin" | "linux";
-        switch (process.platform) {
-            case ("win32"): system = "windows"; break;
-            case ("darwin"): system = "darwin"; break;
-            default: system = "linux";
-        }
+
         if (system in script.settings)
             sys = script.settings[system];
     }
     if (!sys || !sys.supported) return { error: `[Error]: Cannot run "${script.name}" as the Host os does not support it`, code: 400 }
     if (!isElevated && sys.root) return { error: `[Error]: Lacking administrator privilidges to run script "${script.name}"`, code: 401 }
+    const pwd = sys.pwd ? new dir(...sys.pwd) : script_folder
+    if (sys.file) {
+        const file = pwd.getFile(sys.file);
+        if (!file.exists()) {
+            return { error: `[Error]: Cannot run "${script.name}" as a required script file is missing!`, code: 404 }
+        }
+        if (system != "windows") {
+            console.log("Running ",script)
+           console.log(execSync("chmod 777 " + file.sysPath()).toString());
+           const p = spawn(file.sysPath());
+           p.stdout.pipe(process.stdout);
+        }
 
-    
+
+    }
 
 }

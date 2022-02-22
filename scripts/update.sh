@@ -12,7 +12,7 @@ then
 elif [ -f "$PACMAN" ];
 then
     echo updating arch.
-    pacman -Suy
+    pacman -Suy --noconfirm
 elif [ -f "$DNF" ];
 then
     echo updating Fedora/CentOS/RedHat.

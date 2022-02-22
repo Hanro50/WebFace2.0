@@ -22,7 +22,7 @@
         const r = await fetch("/api/scripts/system/list");
         const json = await r.json();
         json.forEach(e => {
-            button(e.name, e.description, () => { })
+            button(e.name, e.description, () => fetch("/api/scripts/run", { headers: { "Content-Type": "application/json" }, method: "POST", body: JSON.stringify({ script: e.script }) }))
         });
 
     </script>
