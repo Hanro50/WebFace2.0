@@ -28,7 +28,6 @@ export function stringify(json: object) {
 }
 
 const isWin = platform() == "win32";
-
 export class dir {
     isRelative() {
         if (this.path.length < 1) return true
@@ -79,7 +78,6 @@ export class dir {
     getDir(..._file: string[]) {
         return new dir(...this.path, ..._file);
     }
-
     getFile(..._file: string[]) {
         return new file(...this.path, ..._file);
     }
@@ -108,9 +106,7 @@ export class dir {
     }
 }
 export class file extends dir {
-    forEach(arg0: (val: any) => void) {
-        throw new Error("Method not implemented.");
-    }
+
     dir(): dir {
         return new dir(...this.path);
     }

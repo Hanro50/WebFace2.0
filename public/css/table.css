@@ -11,7 +11,6 @@ tr {
 td,
 th {
     border: 1px solid white;
-
 }
 
 td div,
@@ -35,7 +34,6 @@ div * {
     text-align: center;
     cursor: pointer;
     transition: 0.5s;
-
 }
 
 .b:hover {

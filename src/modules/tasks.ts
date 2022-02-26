@@ -30,24 +30,18 @@ ws.app.ws('/', function (ws, req) {
                     default:
                         this.send(JSON.stringify({ target: mess.data, message: "Error: Unknown command!", type: "error" }));
                 }
-        } catch {
-
-        }
+        } catch {}
         console.log(msg)
     });
 });
-
 interface task {
     data: { target: string, message: string, type: "error" | "info" }[];
 }
-
 const tasks: Map<string, task> = new Map();
 tasks.set("main", { data: [] });
 const logLimit = config.logLimit || 10000;
 log_router.get("/list", (req, res) => res.type("json").send(JSON.stringify(Array.from(tasks.keys()))).end());
-
 function broadcast(target: string, message: string, type: "error" | "info") {
-
     const task = tasks.get(target)
     if (task == null) return;
     if (task.data.length > logLimit) task.data.shift()
@@ -68,13 +62,11 @@ process.stdout.write = (...args: any) => {
     /**@ts-ignore */
     return process.stdout._write(...args);
 }
-
 /**@ts-ignore */
 process.stderr.write = (...args: any) => {
     broadcast("main", args[0], "error");
     /**@ts-ignore */
     return process.stderr._write(...args);
 }
-
 console.log("Logs are set up!")
 

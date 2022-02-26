@@ -49,7 +49,6 @@ script_router.get("/list", (req, res) => {
     res.type("json").send(JSON.stringify(ret)).end()
 })
 
-
 script_router.post("/run", (req, res) => {
     if (!req.body.script) return res.status(400).type("json").send(JSON.stringify({ error: "No script specified" })).end();
     const scriptFile: string = req.body.script;
@@ -65,8 +64,6 @@ script_router.post("/run", (req, res) => {
     const result = run(scriptINI);
     console.log(result)
     if (result && "error" in result) return res.status(result.code).type("json").send(JSON.stringify({ error: result.error })).end();
-
-
     res.status(200).end();
 })
 
@@ -100,8 +97,5 @@ function run(script: script): { error: string, code: number } {
            const p = spawn(file.sysPath());
            p.stdout.pipe(process.stdout);
         }
-
-
     }
-
 }

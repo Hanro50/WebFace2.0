@@ -18,7 +18,6 @@ interface settings {
     cloudflare?: string
     logLimit?: number;
     //noInsecure being set to true will disable the vanilla http server
-
 }
 export const LICENCE = new file("LICENSE");
 

@@ -10,6 +10,7 @@ import HttpProxy from 'http-proxy';
 const ports: Map<String, HttpProxy> = new Map();
 import http, { IncomingMessage, ServerResponse } from "http";
 import https from "https";
+import { file } from "../utils/files.js";
 interface dns {
     domain: string,
     redirect: string,
@@ -17,6 +18,27 @@ interface dns {
     open?: boolean,
     name?: string
 }
+
+function decodeUA(str: string): { Mozilla?: Number, AppleWebKit?: Number, Gecko?: Number, Chrome?: Number, Firefox?: Number, Mobile?: true } {
+    let ua = {}
+    str = str.replace(/ *\([^)]*\) */g, " ");
+    str.split(" ").forEach(e => {
+        if (e.includes("/"))
+            try {
+                const obj = e.split("/");
+                ua[obj[0]] = Number(obj[1].split(".")[0])
+                if (Number.isNaN(ua[obj[0]])) {
+                    ua[obj[0]] = true;
+                }
+            } catch (err) { console.log(err) }
+        else if (e.trim().length > 0) {
+            ua[e] = true;
+        }
+    })
+    return ua
+}
+const ood = new file("private", "unsupported.html")
+
 export class server {
     router: Router;//
     wrap(server: http.Server, port: Number, protocol: string) {
@@ -117,10 +139,15 @@ export class server {
     }
     //Uses the native http client to make it faster.
     proxy(client_req: IncomingMessage, client_res: ServerResponse, port: number, protocol: string) {
+        const au = decodeUA(client_req.headers ? client_req.headers["user-agent"] : "");
         async function p(host: string): Promise<void> {
             const result = data.get(host);
             if (result != null) {
                 const url = new URL((result.redirect.includes("://") ? "" : protocol + "://") + result.redirect);
+                client_req.headers["wf-time"] = String(Date.now());
+                client_req.headers["wf-au-decoded"] = JSON.stringify(au);
+                client_req.headers["wf-proxied"] = "true"; //Used by clients to test for connection
+                client_req.headers["wf-client-ip"] = client_req.socket.remoteAddress;
                 var options: http.RequestOptions = {
                     hostname: url.hostname,
                     port: url.port,
@@ -146,10 +173,22 @@ export class server {
                 let links = "";
                 data.forEach((v, k) => { if (v.name && v.open) links += `<a href="${protocol}://${k}">${v.name}</a>` });
                 links += `<a href="/LICENCE">LICENCE</a>`;
-                const d = getTemplate("Error 404", "Error 404: Cannot find resource", links);
+                const d = getTemplate("Error 404", "Error 404: Cannot find resource", links, "The 404 page for a multi web service providing server.");
                 client_res.writeHead(404, { 'Content-Length': Buffer.byteLength(d), "content-type": "text/html" }).end(d);
             }
         }
-        p(client_req.headers.host);
+        //Needed for fetch to work...Also I hate IE
+        if ((au.AppleWebKit > 604 || au.Firefox > 57 || au.Chrome > 66)) {
+            p(client_req.headers.host);
+        } else {
+            if (client_req.url == "/LICENCE") {
+                const d = getLicence();
+                client_res.writeHead(200, { 'Content-Length': Buffer.byteLength(d), "content-type": "text/html" }).end(d);
+            } else {
+                console.log(au)
+                const d = ood.read();
+                client_res.writeHead(406, { 'Content-Length': Buffer.byteLength(d), "content-type": "text/html" }).end(d);
+            }
+        }
     }
 }
