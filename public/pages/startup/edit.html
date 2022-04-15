@@ -24,7 +24,7 @@
                 <div>Name</div>
             </td>
             <td>
-                <div><input></input></div>
+                <div><input ID="Name" required></input></div>
             </td>
         </tr>
         <tr>
@@ -32,7 +32,7 @@
                 <div>Excution path</div>
             </td>
             <td>
-                <div><input></input></div>
+                <div><input ID="Path"></input></div>
             </td>
         </tr>
         <tr>
@@ -40,7 +40,7 @@
                 <div>Start at Startup</div>
             </td>
             <td>
-                <div><input type="checkbox"></input></div>
+                <div><input type="checkbox" ID="Startup"></input></div>
             </td>
         </tr>
         <tr>
@@ -48,7 +48,7 @@
                 <div>Run as root</div>
             </td>
             <td>
-                <div><input type="checkbox"></input></div>
+                <div><input type="checkbox" ID="Root"></input></div>
             </td>
         </tr>
         <tr>
@@ -56,7 +56,23 @@
                 <div>Advance mode</div>
             </td>
             <td>
-                <div><input type="checkbox"></input></div>
+                <div><input ID="AdvanceSwitch" type="checkbox" onclick="toggle()"></input></div>
+            </td>
+        </tr>
+        <tr id="bas">
+            <td>
+                <div>Basic script</div>
+            </td>
+            <td>
+                <div><textarea ID="Basic"></textarea></div>
+            </td>
+        </tr>
+        <tr id="adv" hidden>
+            <td>
+                <div>Advance script</div>
+            </td>
+            <td class="b" ID="Advance">
+                <div>Select file (no file selected)</div>
             </td>
         </tr>
         <tr>
@@ -64,23 +80,7 @@
                 <div>Description</div>
             </td>
             <td>
-                <div><textarea></textarea></div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div>Basic script</div>
-            </td>
-            <td>
-                <div><textarea></textarea></div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div>Advance script</div>
-            </td>
-             <td class="b">
-                <div>Select file (no file selected)</div>
+                <div><textarea ID="Description"></textarea></div>
             </td>
         </tr>
         <tr>
@@ -88,11 +88,64 @@
                 <div>Save changes</div>
             </td>
             <td class="b">
-                <div>Save</div>
+                <div onclick="save()">Save</div>
             </td>
         </tr>
     </table>
     <script>
+        const dat = new Map;
+
+        ["Name", "Path", "Advance", "Startup", "Root", "AdvanceSwitch", "Basic", "Advance", "Description"].forEach(e => {
+            dat.set(e, document.getElementById(e));
+        })
+
+        function toggle() {
+            const advance_gui = document.getElementById("adv");
+            const basic_gui = document.getElementById("bas");
+            basic_gui.hidden = !basic_gui.hidden;
+            advance_gui.hidden = !advance_gui.hidden;
+        }
+
+        function save() {
+            const forum = {};
+            const keyz = Array.from(dat.keys());
+            setTimeout(() => {
+
+
+                let c = ["#ff1717", "#fd1717", "#dd1717", "#de1717", "#ee1717", "#bb1717", "#aa1717", "#991717", "#881717", "#771717", "#661717","#551717", "#441717", "#331717", "#221717", "#171717", ""]
+                const inter = setInterval(() => {
+                    if (c.length > 0) {
+                        const clr = c.shift();
+                        dat.forEach(v => {
+                            if (v.parentNode.parentNode.style.backgroundColor !== "")
+                                v.parentNode.parentNode.style.backgroundColor = clr;
+                        })
+                    } else
+                        clearInterval(inter)
+                }, 50)
+            }, 100)
+            for (var i = 0; i < keyz.length; i++) {
+                const k = keyz[i];
+                const v = dat.get(k);
+                console.log(dat)
+                if (v instanceof HTMLInputElement || v instanceof HTMLTextAreaElement) {
+                    console.log(v.hidden)
+                    if (!v.hidden) {
+                        if (v.required && v.value.trim().length < 1) {
+                            v.parentNode.parentNode.style.backgroundColor = "#ff0000";
+                            return;
+                        }
+                        console.log(v.required)
+                        forum[k] = v.value;
+
+                    }
+                }
+
+            }
+            console.log(forum);
+
+        }
+
         Array.from(document.getElementsByTagName("div")).forEach(element => {
             const e = element.firstElementChild;
             if (e instanceof HTMLInputElement && e.type == "checkbox") {
