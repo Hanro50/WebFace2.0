@@ -2,12 +2,17 @@
 import { mapObj } from "../main.js";
 import { meta } from "../taskServ.js";
 import { button, uuid4 } from "./util.js";
+let saved = true;
 class inp {
     private chkBox: boolean;
     input: HTMLInputElement;
     constructor(input: HTMLInputElement) {
         this.input = input;
         this.chkBox = input.type == "checkbox";
+        if (this.chkBox)
+        this.input.addEventListener('mousedown',() => saved = false);
+        
+        this.input.onkeydown = () => saved = false;
     }
 
     getValue() {
@@ -52,19 +57,30 @@ const scrptin = document.getElementById("script") as HTMLTextAreaElement;
 
 const savebtn = document.getElementById("savebtn") as HTMLTableCellElement;
 const delbtn = document.getElementById("delbtn") as HTMLTableCellElement;
+const strttn = document.getElementById("strttn") as HTMLTableCellElement;
+strttn.onclick = async () => {
 
+    if (await save())
+        window.location.href = `/api/scripts/${namein.value}/run`
+}
 async function save() {
+    if (namein.value.trim().length < 1 && !namein.disabled) {
+        alert("Please provide the a valid name for the script first");
+        return false;
+    }
     namein.disabled = true;
     const ret: any = { data: scrptin.value };
     inputs.forEach(e => {
         ret[e.getID()] = e.getValue();
     })
     const r = await fetch(`/api/scripts/${namein.value}`, { headers: { "content-type": "application/json" }, method: "POST", body: JSON.stringify(ret) })
-    if (r.ok)
+    const svd = r.ok;
+    if (svd)
         j = await (await fetch("/api/scripts/")).json();
     else if (r.status == 400) alert("Did not save data due to no data field being empty");
     else alert(`Did not save data due to error\nCode: ${r.status}`);
     genButtons();
+    return svd;
 }
 async function del() {
     if (namein.disabled) {
@@ -87,6 +103,7 @@ function clear() {
 }
 
 scrptin.onkeyup = () => {
+    saved = false;
     if (scrptin.value.startsWith("#!")) {
         runin.disabled = true;
         runin.value = scrptin.value.includes("\n") ? scrptin.value.substring(2, scrptin.value.indexOf("\n")) : scrptin.value.substring(2);
@@ -95,24 +112,28 @@ scrptin.onkeyup = () => {
 }
 savebtn.onclick = save;
 delbtn.onclick = del;
+
+
+async function load(index: string) {
+    const obj = j[index];
+    if (!obj) return;
+    buttons.style.display = "none";
+    table.style.display = "";
+    namein.disabled = true;
+    scrptin.value = await (await fetch(`/api/scripts/${obj.name}`)).text();
+    inputs.forEach(e => {
+        const val = obj as any;
+        e.setValue(val[e.getID()])
+    })
+
+}
 function genButtons() {
     buttons.innerHTML = "";
     button("back", () => window.location.href = "./nav.html", buttons);
 
     Object.keys(j).forEach(e => {
-        const obj = j[e];
-        console.log(obj)
         button(e, async () => {
-
-            buttons.style.display = "none";
-            table.style.display = "";
-            namein.disabled = true;
-            scrptin.value = await (await fetch(`/api/scripts/${obj.name}`)).text();
-            inputs.forEach(e => {
-                const val = obj as any;
-                e.setValue(val[e.getID()])
-            })
-
+            load(e)
         }, buttons);
     });
 
@@ -123,7 +144,8 @@ function genButtons() {
 table.style.display = "none";
 
 const div = button("back", () => {
-    if (confirm("Save changes?\nPress 'ok' to save!")) save();
+    if (!saved)
+        if (confirm("Save changes?\nPress 'ok' to save!")) save();
     table.style.display = "none";
     buttons.style.display = "";
 }, table);
@@ -145,3 +167,7 @@ async function loadRuntime() {
     })
 }
 loadRuntime();
+const script = new URL(location.href).searchParams.get('script');
+if (script) {
+    load(script);
+}

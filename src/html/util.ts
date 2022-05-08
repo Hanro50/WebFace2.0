@@ -41,7 +41,7 @@ export function licenceButton(){
         button(`Back`,()=> window.location.reload());
         const pre = document.createElement('pre'); 
         const license: string = await (await fetch("license.txt")).text();
-        console.log(license)
+  //      console.log(license)
         pre.innerText = license;
         document.body.appendChild(pre);
         const br = document.createElement('div');

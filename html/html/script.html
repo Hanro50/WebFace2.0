@@ -54,15 +54,13 @@
             height: calc(80vh - 250px);
         }
 
-        #savebtn,
-        #delbtn {
+        .btn {
             transition-duration: 0.5s;
             text-align: center;
             font-weight: bold;
         }
 
-        #savebtn:hover,
-        #delbtn:hover {
+        .btn:hover {
             background-color: #333;
 
         }
@@ -110,9 +108,6 @@
                 <th>Script</th>
                 <td><textarea id="script"></textarea></td>
             </tr>
-           
-        </table>
-        <table class="tb2">
             <tr>
                 <th>Startup</th>
                 <td><input id="startup" type="checkbox"></td>
@@ -124,10 +119,13 @@
         </table>
         <table class="tb2">
             <tr>
-                <th id="savebtn">Save</th>
+                <th class="btn" id="savebtn">Save</th>
             </tr>
             <tr>
-                <th id="delbtn">Delete/Clear</th>
+                <th class="btn" id="strttn">Start script</th>
+            </tr>
+            <tr>
+                <th class="btn" id="delbtn">Delete/Clear</th>
             </tr>
         </table>
     </div>
