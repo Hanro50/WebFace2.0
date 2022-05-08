@@ -1,49 +1,57 @@
-var Convert = require('ansi-to-html');
-var convert = new Convert();
-const taskHeader = document.getElementById('task')
+import "../util.js";;
+import type { log } from "../../taskServ";
+import Convert from "../ansi-to-html.js";
+var convert = Convert({});
+const taskHeader = document.getElementById('task') as HTMLDivElement;
 const id = new URL(location.href).searchParams.get('task') || "main";
 taskHeader.innerText = id;
-/**@type {WebSocket} */
-let socket;
-const term = document.getElementById('terminal')
+
+let socket: WebSocket;
+const term = document.getElementById('terminal') as HTMLDivElement;
 function terminate() {
     if (socket && socket.readyState == socket.OPEN) socket.send(JSON.stringify({ task: "kill", data: id }))
     else term.innerHTML += `<div class="error"> Error: Console is disconnected!</div>`;
 }
-function clear() {
+const termbut = document.getElementById('terminate');
+if (termbut) termbut.onclick = terminate;
+const clr = document.getElementById('clear');
+if (clr) clr.onclick = () => {
     term.innerHTML = `<div class="connected"> Open: Cleared the console!</div>`;
     if (socket && socket.readyState == socket.OPEN) socket.send(JSON.stringify({ task: "clear", data: id }))
     else term.innerHTML = `<div class="error"> Error: Console is disconnected!</div>`;
 }
-function disconnect(){
-    if (socket && socket.readyState == socket.OPEN)  socket.close()
+const disc = document.getElementById('disconnect');
+if (disc) disc.onclick = () => {
+    if (socket && socket.readyState == socket.OPEN) socket.close()
     else term.innerHTML += `<div class="error"> Error: Console is already disconnected!</div>`;
 }
-const a = async () => {
-    /**@type {HTMLDivElement}*/
+const r = await fetch(`/api/tasks/${id}`)
 
-    /**@param info {{ target:string, message:string, type:"error"|"info" }}*/
-    function broadcast(info) {
-        if (info.target != id) return;
+if (r.ok) {
+    const json: log[] = await r.json();
+    function broadcast(info: log) {
         const scroll = term.scrollTop + term.clientHeight == term.scrollHeight
-        info.message.split("\n").forEach(v => { if (v.trim().length > 0) term.innerHTML += convert.toHtml(v.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;").replace(/\s/g, "&nbsp;")) + "<br>" });
+        if (info.line.trim().length > 0) term.innerHTML += convert.toHtml((info.code == "error" ? "\\033[31;" : "") + info.line.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;").replace(/\s/g, "&nbsp;") + (info.code == "error" ? "\\033[0;" : "")) + "<br>";
         if (scroll) term.scrollTop = term.scrollHeight - term.clientHeight;
     }//
-    socket = new WebSocket('ws://' + window.location.host);
+    console.log(json)
+    json.forEach(broadcast);
+    socket = new WebSocket(`ws://${window.location.host}/api/tasks/${id}`);
     // Listen for messages
     socket.addEventListener('message', function (event) {
+        console.log('Message from server ', event.data);
         broadcast(JSON.parse(event.data))
     });
     // Connection opened
     socket.addEventListener('open', function (event) {
-        term.innerText = ""
         console.log("Connected!");
         term.innerHTML += `<div class="connected"> Open: Connected to console!</div>`;
-        socket.send(JSON.stringify({ task: "refresh", data: id }))
         // load()
     });
     socket.onclose = () => term.innerHTML += `<span class="error">Error: Lost console connection!</span>`;
-};
-a();
 
-window.taskmon = { clear, terminate,disconnect }
+
+} else {
+    terminate();
+}
+//window.taskmon = { clear, terminate,disconnect }

@@ -76,6 +76,7 @@ typings/
 .fusebox/
 
 # WebFace 2.0
-.data
+data
 dist
 package-lock.json
+

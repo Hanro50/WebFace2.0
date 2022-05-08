@@ -1,24 +1,23 @@
+import Express from "express"
 import bodyParser from "body-parser";
-import exp from "express";
-import { config, LICENCE } from "./utils/consts.js";
-export const app = exp();
-import { server } from "./modules/sockets.js";
-import { getLicence } from "./utils/template.js";
-import wsserv from "express-ws";
+import { existsSync, mkdirSync } from "fs";
+import expWS from "express-ws"
 
-export const ws = wsserv(app);
-const proxy = new server();
-//This is here to insure the LICENCE file is not excluded
-if (!LICENCE.exists() || !LICENCE.sha1("b4d7662bb6b0b804c8fc94f7bc81f59dce0c36f3")) {
-    console.error("Cannot validate licence")
-    process.exit();
+export const appWS = expWS(Express(),undefined,{});
+export const app = appWS.app;
+export const dataFile = "data";
+export interface mapObj<T> {
+    [key: string]: T;
 }
-app.get("/LICENSE", (req, res) => {
-    res.type("html").send(getLicence()).end();
-})
-app.use(exp.static("public"));
-app.use(bodyParser.json());
-app.use("/api/ports", proxy.router);
-app.listen(config.main.port, () => {
-    console.log(`Main maintenance interface on http://localhost:${config.main.port}`)
-})
+if (!existsSync(dataFile)) {
+    mkdirSync(dataFile);
+}
+
+app.use(Express.static("html"));
+app.use("/modules", Express.static("dist/html"));
+app.use(bodyParser.json())
+
+
+app.listen(8080);
+
+

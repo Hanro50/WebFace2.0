@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/css/index.css">
+    <style>
+ 
+
+        input {
+            width: 27vw;
+            padding: 0;
+            border: 0;
+            background-color: transparent;
+            color: white;
+            font-size: inherit;
+            font-family: inherit;
+        }
+
+        textarea:focus,
+        input:focus {
+            outline: none;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding-left: 5px;
+            padding-right: 5px;
+
+        }
+
+        td:nth-child(5) {
+            transition-duration: 0.5s;
+            text-align: center;
+            font-weight: bold;
+
+        }
+
+        td:nth-child(5):hover {
+            background-color: #333;
+
+        }
+
+        td:nth-child(4) {
+            padding: 0;
+        }
+
+        input[type=checkbox] {
+            margin-left: 0;
+            margin-right: 0;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Main menu</h1>
+    <script type="module" src="/modules/proxy.js"></script>
+
+    <table id="table">
+        <tr id="head">
+            <th>Incoming</th>
+            <th>=></th>
+            <th>port</th>
+            <th>hide</th>
+            <th>options</th>
+        </tr>
+        <tr>
+            <td><input id="host" type="text" placeholder="example.com"></td>
+            <td>=></td>
+            <td><input id="port" type="number" placeholder="8080"></td>
+            <td><input id="hide" type="checkbox" checked="true"></td>
+            <td id="post">submit</td>
+
+        </tr>
+
+    </table>
+</body>
+
+
+</html>

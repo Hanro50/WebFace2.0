@@ -21,6 +21,7 @@ body{
     animation-duration: 0.5s;
     animation-delay: 0s;
     animation-name: fade_in_page;
+    transform: display 0s !important;
     font-family: sans-serif;
 }
 h1{
@@ -48,11 +49,17 @@ hr{
     font-style: bold;
     font-weight: bold;
     border: 2px solid #202020;
-    transition:  all 0s,background-color 0.5s !important;
+    transition:  all 0s,background-color 0.5s,transform 0.5s !important;
     flex-direction: column;
     align-items: center;
 }
 
 h6{
     margin: 0;
+}
+
+.button:hover {
+    background-color: #555;
+    border: 2px solid #222;
+    transform: scale(1.1);
 }

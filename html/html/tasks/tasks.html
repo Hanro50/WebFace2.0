@@ -2,8 +2,12 @@
 <html>
 
 <head>
-    <script src="/scripts/ansi-to-html.js"></script>
+    <link rel="stylesheet" href="/css/index.css">
     <style>
+        hr {
+            width: 95%;
+        }
+
         #terminal {
 
             overflow-y: scroll;
@@ -105,21 +109,20 @@
 </head>
 
 <body>
-    <h1>Task manager:</h1>
-    <div id="task">Loading...</div>
-    <hr>
+    <h1>Task manager:[<span id="task">Loading...</span>]</h1>
     <div id="nav">
-        <div class="button" onclick="window.location.href='../nav.html'">Back</div>
-        <div class="button" onclick="window.location.href='./service.html'">Service&nbsp;select</div>
+       
         <div class="button" onclick="window.location.reload()">Refresh</div>
-        <div class="button" onclick="taskmon.disconnect();">Disconnect</div>
-        <div class="button" onclick="taskmon.clear();">Clear</div>
-        <div class="button" onclick="taskmon.terminate();">Terminate</div>
+        <div class="button" id="disconnect">Disconnect</div>
+        <div class="button" id="clear">Clear</div>
+        <div class="button" id="terminate">Terminate</div> 
+        <div class="button" onclick="window.location.href='./service.html'">Back</div>
     </div>
     <div id="holder">
         <div id="terminal">Loading...</div>
     </div>
-    <script src="/scripts/taskmon.js"></script>
+    <script type="module" src="/modules/tasks/processes.js"></script>
+    
 </body>
 
 </html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/css/index.css">
+    <style>
+        body {
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        table {
+            width: 70vw;
+        }
+
+        th {
+            text-align: left;
+        }
+
+        td {
+            width: 90%;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 0;
+            border: 0;
+            background-color: transparent;
+            color: white;
+            font-size: inherit;
+            font-family: inherit;
+        }
+
+        textarea:focus,
+        input:focus {
+            outline: none;
+        }
+
+        textarea {
+            width: calc(100% - 5px);
+            resize: none;
+            height: calc(80vh - 250px);
+        }
+
+        #savebtn,
+        #delbtn {
+            transition-duration: 0.5s;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        #savebtn:hover,
+        #delbtn:hover {
+            background-color: #333;
+
+        }
+
+        #table,
+        #buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        div {
+            width: 100%;
+        }
+
+        .tb2,
+        .tb2 * {
+            border-top: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Startup</h1>
+    <script type="module" src="/modules/script.js"></script>
+
+    <div id="buttons">
+
+    </div>
+    <div id="table" style="display: none;">
+        <table>
+            <tr>
+                <th>Title</th>
+                <td><input id="name" type="text"></td>
+            </tr>
+            <tr>
+                <th>Process directory</th>
+                <td><input id="pwd" type="text" value="~/"></td>
+            </tr>
+            <tr>
+                <th>Runner</th>
+                <td><input id="runner" list="runners" type="text" value="bin/bash" placeholder="bin/bash"></td>
+            </tr>
+            <tr>
+                <th>Script</th>
+                <td><textarea id="script"></textarea></td>
+            </tr>
+           
+        </table>
+        <table class="tb2">
+            <tr>
+                <th>Startup</th>
+                <td><input id="startup" type="checkbox"></td>
+            </tr>
+            <tr>
+                <th>Restart</th>
+                <td><input id="restart" type="checkbox"></td>
+            </tr>
+        </table>
+        <table class="tb2">
+            <tr>
+                <th id="savebtn">Save</th>
+            </tr>
+            <tr>
+                <th id="delbtn">Delete/Clear</th>
+            </tr>
+        </table>
+    </div>
+
+    <datalist id="runners">
+
+
+    </datalist>
+</body>
+
+
+</html>
