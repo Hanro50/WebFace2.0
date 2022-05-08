@@ -1,4 +1,13 @@
 /**
+ * Notice:
+ * Converted to a web module by browserify. This code is external to
+ * the rest of the project it is housed within and is thus only subject
+ * to the licences housed within this header. Apart from adding a few
+ * lines of code to convert this module into an ES6 module. This document 
+ * has not been modified. Please support the original creators of this here 
+ * code if at all possible. As it is critical to the continued operation of
+ * the rest of this here project.
+ * 
  * ansi-to-html: Licence 
  * Copyright (c) 2012 Rob Burns
  *
@@ -27,14 +36,28 @@
  * Copyright (c) Felix Böhm
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions 
+ * are met:
  * 
- * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * Redistributions of source code must retain the above copyright notice, 
+ * this list of conditions and the following disclaimer.
  * 
- * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * Redistributions in binary form must reproduce the above copyright notice, 
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution.
  * 
- * THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ * OF THIS, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 let require = () => { }; require = (function () { function r(e, n, t) { function o(i, f) { if (!n[i]) { if (!e[i]) { var c = "function" == typeof require && require; if (!f && c) return c(i, !0); if (u) return u(i, !0); var a = new Error("Cannot find module '" + i + "'"); throw a.code = "MODULE_NOT_FOUND", a; } var p = n[i] = { exports: {} }; e[i][0].call(p.exports, function (r) { var n = e[i][1][r]; return o(n || r); }, p, p.exports, r, e, n, t); } return n[i].exports; } for (var u = "function" == typeof require && require, i = 0; i < t.length; i++)o(t[i]); return o; } return r; })()({
   1: [function (require, module, exports) {
@@ -747,15 +770,6 @@ let require = () => { }; require = (function () { function r(e, n, t) { function
 }, {}, []);
 
 /**
- * Notice:
- * Converted to a web module by browserify. This code is external to
- * the rest of the project it is housed within and is thus only subject
- * to the licence housed within the header. Apart from this comment and
- * the ammendment of the required licence text. This document has not
- * been modified. Please support the original creators of this here code
- * if at all possible. As it is critical to the continued operation of
- * the rest of this here project.
- *
  * The below code is just a converter to make it work with ES6 properly.
  * It is the only original code in the whole document. 
  */

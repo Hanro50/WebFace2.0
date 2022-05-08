@@ -2,9 +2,7 @@
 The source code for my private web interface I use for my Raspberry Pi. This is an attempt to rewrite that interface using more modern JavaScript standards and UI principles. 
 
 ## Proxy module:
-> /src/server.ts
-
-This module is still missing some features, but is non the less mostly complete.
+> /src/proxy.ts
 
 This module will handle handles redirects to various internal servers based on the host field provided by the browser which is attempting to connect. This is done internally by using node's native http components. 
 

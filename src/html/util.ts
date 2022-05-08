@@ -33,3 +33,20 @@ export function uuid4() {
         return v.toString(16);
     });
 }
+
+
+export function licenceButton(){
+    button(`Licence txt`, async () => {
+        document.body.innerHTML = "";
+        button(`Back`,()=> window.location.reload());
+        const pre = document.createElement('pre'); 
+        const license: string = await (await fetch("license.txt")).text();
+        console.log(license)
+        pre.innerText = license;
+        document.body.appendChild(pre);
+        const br = document.createElement('div');
+        br.innerHTML = "&nbsp;"
+        br.style.height = '20px';
+        document.body.appendChild(br); 
+    })
+}

@@ -4,10 +4,8 @@
 <head>
     <link rel="stylesheet" href="/css/index.css">
     <style>
- 
-
         input {
-            width: 27vw;
+            width: 19vw;
             padding: 0;
             border: 0;
             background-color: transparent;
@@ -31,20 +29,24 @@
 
         }
 
-        td:nth-child(5) {
+        td:nth-child(6) {
             transition-duration: 0.5s;
             text-align: center;
             font-weight: bold;
 
         }
 
-        td:nth-child(5):hover {
+        td:nth-child(6):hover {
             background-color: #333;
 
         }
 
-        td:nth-child(4) {
+        td:nth-child(5) {
             padding: 0;
+        }
+
+        td:nth-child(4) *{
+            width: 10vw;
         }
 
         input[type=checkbox] {
@@ -64,6 +66,7 @@
         <tr id="head">
             <th>Incoming</th>
             <th>=></th>
+            <th>Redirect</th>
             <th>port</th>
             <th>hide</th>
             <th>options</th>
@@ -71,6 +74,7 @@
         <tr>
             <td><input id="host" type="text" placeholder="example.com"></td>
             <td>=></td>
+            <td><input id="prxy" type="text" placeholder="127.0.0.1" value="localhost"></td>
             <td><input id="port" type="number" placeholder="8080"></td>
             <td><input id="hide" type="checkbox" checked="true"></td>
             <td id="post">submit</td>

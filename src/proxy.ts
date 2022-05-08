@@ -7,6 +7,7 @@ import { join } from "path";
 export interface proxy {
     port: number;
     host: string;
+    prxy: string;
     hide: boolean;
 }
 
@@ -35,7 +36,6 @@ if (existsSync(join(dataFile, "proxies.json"))) {
 }
 app.get("/api/proxies/", (req, res) => res.status(200).type("json").send(JSON.stringify(getProxiesObj())).end())
 app.post("/api/proxies/:method/:proxy/", (req, res) => {
-    console.log(req.body)
     if (req.params.method == "remove") {
         if (proxies.delete(req.params.proxy)) save();
         return res.status(200).end();
@@ -60,8 +60,8 @@ app.post("/api/proxies/:method/:proxy/", (req, res) => {
 const links = new Map<string, { dist: string, type: string }>();
 links.set("/modules/404.js", { dist: "dist/html/404.js", type: "text/javascript" });
 links.set("/modules/util.js", { dist: "dist/html/util.js", type: "text/javascript" });
-links.set("/css/button.css", { dist: "html/css/button.css", type: "text/css" });
-links.set("/license.txt", { dist: "license.txt", type: "text/plain" });
+links.set("/css/index.css", { dist: "html/css/index.css", type: "text/css" });
+links.set("/license.txt", { dist: "LICENSE", type: "text/plain" });
 
 //Uses the native http client to make it faster.
 function proxy(req: IncomingMessage, res: ServerResponse) {
@@ -69,6 +69,8 @@ function proxy(req: IncomingMessage, res: ServerResponse) {
     const host = req.headers.host?.split(":")[0] || "";
     //Gets the port that the request should be redirected to
     const result = proxies.get(host || "");
+    console.log(result)
+
     if (result != null) {
         //Adding some of our own headers
         req.headers["wf-time"] = String(Date.now());
@@ -84,19 +86,32 @@ function proxy(req: IncomingMessage, res: ServerResponse) {
         head += "\r\n\r\n"
         //We're going to be handling the raw http sockets here. 
         const client = req.socket;
+   
         //next we need to create the internal connection. The host property can be the IP or the dns address of the webserver you want to proxy 
-        const server = net.connect({ port: result.port, host: "localhost" }, () => {
+        const server = net.connect({ port: result.port, host: result.prxy || "localhost" }, () => {
+            client.removeAllListeners();
             //This links the server and client
             server.pipe(client);
+            client.pipe(server);
             //We're simply passing along the header
             server.write(head)
         });
-        //If the server or client time out, we need to then destroy the other. 
-        server.on('end', () => client.end());
-        client.on('end', () => server.end());
+        server.on('connect', () => {
 
-        server.on('error', () => client.end());
-        client.on('error', () => server.end());
+        })
+        function done() {
+            //Needed to insure everything has been dereverenced to avoid memory leaks
+            client.unpipe(server);
+            server.unpipe(client);
+            client.end().destroy().unref();
+            server.end().destroy().unref();
+        }
+        //If the server or client time out, we need to then destroy the other. 
+        server.on('end', done);
+        client.on('end', done);
+
+        server.on('error', () => done);
+        client.on('error', () => done);
     } else if (req.url && links.has(req.url)) {
         const link = links.get(req.url) || { dist: "", type: "error" };
         const d = existsSync(link.dist) ? readFileSync(link.dist) : "";
