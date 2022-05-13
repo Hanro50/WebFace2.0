@@ -1,4 +1,4 @@
-import type { proxy } from "../proxy.js";
+import type { proxy } from "../constants.js";
 import { button, licenceButton } from "./util.js";
 
 const a: proxy[] = await (await fetch("/api/pages")).json();

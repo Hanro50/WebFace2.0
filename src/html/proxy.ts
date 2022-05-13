@@ -1,5 +1,4 @@
-import type { mapObj } from "../main.js";
-import type { proxy } from "../proxy.js";
+import type { mapObj,proxy } from "../constants.js";
 import { button } from "./util.js";
 
 const div = button("back", () => window.location.href = "./nav.html");

@@ -53,7 +53,13 @@ if (r.ok) {
     function broadcast(info: log) {
         console.log(info)
         const scroll = term.scrollTop + term.clientHeight == term.scrollHeight
-        if (info.line.trim().length > 0) term.innerHTML += `<div ${info.code == "error" ? 'class="error">Error: ' : ">"}${convert.toHtml(info.line.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;").replace(/\s/g, "&nbsp;"))}</div>`;
+        let out = ">"
+        switch (info.code) {
+            case ("error"): out = 'class="error">Error: '; break;
+            case ("end"): out = 'class="error">Ended: '; break;
+        }
+
+        if (info.line.trim().length > 0) term.innerHTML += `<div ${out}${convert.toHtml(info.line.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;").replace(/\s/g, "&nbsp;"))}</div>`;
         if (scroll) term.scrollTop = term.scrollHeight - term.clientHeight;
     }//
     //   console.log(json)

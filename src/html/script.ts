@@ -1,6 +1,5 @@
 
-import { mapObj } from "../main.js";
-import { meta } from "../taskServ.js";
+import { mapObj,meta } from "../constants.js";
 import { button, uuid4 } from "./util.js";
 let saved = true;
 class inp {

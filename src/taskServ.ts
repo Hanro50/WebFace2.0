@@ -1,22 +1,11 @@
-import { ChildProcess, execFile, spawn, spawnSync } from "child_process";
+import { ChildProcess, spawn } from "child_process";
 import { createHash, randomUUID } from "crypto";
 import { chmodSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import path, { join } from "path";
-import { app, dataFile, mapObj } from "./main.js";
-export interface meta {
-    name: string;
-    path: string;
-    startup?: boolean;
-    restart?: boolean;
-    pwd?: string;
-    runner?: string;
-}
-export interface script {
-    meta: meta,
-    data: string,
+import { dataFile, mapObj, meta } from "./constants.js";
+import { app } from "./main.js";
 
-}
 const projects = new Map<string, meta>();
 const folder = join(dataFile, "scripts")
 function tometaObj() {
@@ -79,7 +68,7 @@ app.use("/api/scripts/:script/:run?", (req, res) => {
     //   console.log(data.startsWith(`#!${meta.runner || "/bin/bash"}`))
     if (req.method.toUpperCase() == "GET") {
         if (req.params.run) {
-            res.redirect(`/html/tasks/tasks.html?task=${startTask(meta)}&script=${req.params.script}`);
+            res.redirect(`/html/tasks/tasks.html?task=${startTask(meta).name}&script=${req.params.script}`);
         } else
             return res.status(200).type("txt").send(data).end();
     }
@@ -106,26 +95,55 @@ app.get("/api/runners", (req, res) => {
     return res.status(200).type("json").send(JSON.stringify(runners)).end();
 
 })
-export type logType = "info" | "error";
+export type logType = "info" | "error" | "end";
 export interface log { code: logType, line: string };
 export interface infTask {
     readonly log: log[];
 }
 process.stdout
 
-function startTask(meta: meta) {
-    chmodSync(meta.path, 0o775)
-    const pwd = existsSync(meta.pwd || "") ? meta.pwd : tmpdir();
-    console.log(`Using: "${pwd}"`)
-    const c = (process.platform == "win32")
-        ? spawn("cmd", ["-c", path.resolve(meta.path)], { cwd: pwd })
-        : spawn("bash", ["-c", path.resolve(meta.path)], { cwd: pwd });
+function startTask(meta: meta): impTask {
+    const internal = (lr = 0, task?: impTask, respool: number = 0) => {
+        let tsk = task as impTask;
+        try {
+            //Avoid a reboot if the task is marked as killed.
+            respool++;
+            if (task && task.killed) return task;
+            if (respool > 5) throw "Runaway script detected. Process has surpased the allowed respool limited\nIt has been blocked from being restarted."
+            else if (lr + 1000 > Date.now()) { console.error("Detected runaway process!"); }
+            else respool = 0;
 
-    const tsk = new impTask(meta.name, c);
-    c.addListener('message', (message) => tsk.write("info", message.toString()))
-    c.on('message', (message) => tsk.write("info", message.toString()))
-    c.on('error', (message) => tsk.write("error", message.toString()))
-    return tsk.name;
+            chmodSync(meta.path, 0o775)
+            const pwd = existsSync(meta.pwd || "") ? meta.pwd : tmpdir();
+            console.log(`Using: "${pwd}"`)
+            const c = (process.platform == "win32")
+                ? spawn("cmd", ["-c", path.resolve(meta.path)], { cwd: pwd })
+                : spawn("bash", ["-c", path.resolve(meta.path)], { cwd: pwd });
+
+            tsk = task?.setTask(c) || new impTask(meta.name, c);
+
+            c.addListener('message', (message) => tsk.write("info", message.toString()))
+            c.on('message', (message) => tsk.write("info", message.toString()))
+            c.on('error', (message) => tsk.write("error", message.toString()))
+
+            c.on('close', () => {
+                console.log("test")
+                if (meta.restart && !tsk.killed) {
+                    try {
+                        
+                        internal(tsk.start, tsk, respool);
+                        tsk.write("end", "Process restarted...")
+                    } catch (e) { };
+                } else
+                    tsk.write("end", "Process has died!")
+            });
+            return tsk;
+        } catch (e) {
+            tsk.write("error", String(e));
+            throw e;
+        };
+    }
+    return internal();
 }
 
 
@@ -135,29 +153,14 @@ class impTask implements infTask {
     log: log[] = [];
     proc: NodeJS.Process | ChildProcess;
     name: string;
-
+    start: number;
+    killed: boolean = false;
     constructor(name: string, proc: NodeJS.Process | ChildProcess) {
+        this.start = Date.now();
         this.clients = new Map();
-        this.proc = proc;
+
         let n = name;
         let i = 1;
-
-        /**@ts-ignore*/
-        proc.stdout.write = (...args: any) => {
-            try { this.write("info", args[0]) } catch (e) { process.stderr._write(JSON.stringify(e), "utf-8", (err) => { }); }
-            /**@ts-ignore */
-            return proc.stdout._write(...args);
-        }
-        /**@ts-ignore */
-        proc.stderr.write = (...args: any) => {
-            try { this.write("error", args[0]) } catch (e) { process.stderr._write(JSON.stringify(e), "utf-8", (err) => { }); }
-            /**@ts-ignore */
-            return proc.stderr._write(...args);
-        }
-
-
-        proc.stdout?.on('data', this.writeCon('info'))
-        proc.stderr?.on('data', this.writeCon('error'))
         while (tasks.has(n)) {
             n = `${name}_${i}`
             i++;
@@ -165,11 +168,36 @@ class impTask implements infTask {
         tasks.set(n, this);
         this.name = n;
 
+        // proc.on('close')
+        this.proc = proc;
+        this.setTask(proc);
     }
+
+    setTask(proc: NodeJS.Process | ChildProcess) {
+        this.proc = proc;
+        /**@ts-ignore*/
+        proc.stdout.write = (...args: any) => {
+            try { mtask.write("info", args[0]) } catch (e) { process.stderr._write(JSON.stringify(e), "utf-8", (err) => { }); }
+            /**@ts-ignore */
+            return proc.stdout._write(...args);
+        }
+        /**@ts-ignore */
+        proc.stderr.write = (...args: any) => {
+            try { mtask.write("error", args[0]) } catch (e) { process.stderr._write(JSON.stringify(e), "utf-8", (err) => { }); }
+            /**@ts-ignore */
+            return proc.stderr._write(...args);
+        }
+        proc.stdout?.on('data', this.writeCon('info'))
+        proc.stderr?.on('data', this.writeCon('error'))
+        return this;
+    }
+
     writeCon(type: logType) {
         return (out: Buffer) => this.write(type, out.toString())
     }
     kill() {
+
+        this.killed = true;
         if (this.name == "main") return this.write("error", "Cannot end 'main' service!")
         tasks.delete(this.name);
         this.clients.forEach(e => e.close());
@@ -204,7 +232,11 @@ const tasks = new Map<String, impTask>();
 
 projects.forEach(e => {
     if (e.startup) {
-        startTask(e);
+        try {
+            startTask(e);
+        } catch (e) {
+
+        }
     }
 })
 
@@ -246,4 +278,5 @@ app.ws("/api/tasks/:task", (web, req) => {
     })
 })
 
-new impTask("main", process);
+const mtask = new impTask("main", process);
+
