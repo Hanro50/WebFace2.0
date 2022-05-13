@@ -130,7 +130,7 @@ function startTask(meta: meta): impTask {
                 console.log("test")
                 if (meta.restart && !tsk.killed) {
                     try {
-                        
+
                         internal(tsk.start, tsk, respool);
                         tsk.write("end", "Process restarted...")
                     } catch (e) { };
@@ -147,7 +147,7 @@ function startTask(meta: meta): impTask {
 }
 
 
-class impTask implements infTask {
+export class impTask implements infTask {
 
     clients: Map<String, WebSocket>;
     log: log[] = [];
@@ -174,22 +174,27 @@ class impTask implements infTask {
     }
 
     setTask(proc: NodeJS.Process | ChildProcess) {
-        this.proc = proc;
-        /**@ts-ignore*/
-        proc.stdout.write = (...args: any) => {
-            try { mtask.write("info", args[0]) } catch (e) { process.stderr._write(JSON.stringify(e), "utf-8", (err) => { }); }
+        try {
+            this.proc = proc;
+            /**@ts-ignore*/
+            proc.stdout.write = (...args: any) => {
+                try { mtask.write("info", args[0]) } catch (e) { process.stderr._write(JSON.stringify(e), "utf-8", (err) => { }); }
+                /**@ts-ignore */
+                return proc.stdout._write(...args);
+            }
             /**@ts-ignore */
-            return proc.stdout._write(...args);
+            proc.stderr.write = (...args: any) => {
+                try { mtask.write("error", args[0]) } catch (e) { process.stderr._write(JSON.stringify(e), "utf-8", (err) => { }); }
+                /**@ts-ignore */
+                return proc.stderr._write(...args);
+            }
+            proc.stdout?.on('data', this.writeCon('info'))
+            proc.stderr?.on('data', this.writeCon('error'))
+            return this;
+        } catch (err) {
+            console.trace(err)
+
         }
-        /**@ts-ignore */
-        proc.stderr.write = (...args: any) => {
-            try { mtask.write("error", args[0]) } catch (e) { process.stderr._write(JSON.stringify(e), "utf-8", (err) => { }); }
-            /**@ts-ignore */
-            return proc.stderr._write(...args);
-        }
-        proc.stdout?.on('data', this.writeCon('info'))
-        proc.stderr?.on('data', this.writeCon('error'))
-        return this;
     }
 
     writeCon(type: logType) {
@@ -278,5 +283,5 @@ app.ws("/api/tasks/:task", (web, req) => {
     })
 })
 
-const mtask = new impTask("main", process);
+export const mtask = new impTask("main", process);
 

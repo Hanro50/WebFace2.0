@@ -64,7 +64,8 @@ if (r.ok) {
     }//
     //   console.log(json)
     json.forEach(broadcast);
-    socket = new WebSocket(`ws://${window.location.host}/api/tasks/${id}`);
+    console.log(window.location.protocol )
+    socket = new WebSocket(`${window.location.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/api/tasks/${id}`);
     // Listen for messages
     socket.addEventListener('message', function (event) {
         console.log('Message from server ', event.data);
