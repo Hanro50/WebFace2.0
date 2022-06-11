@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { createReadStream, existsSync, readFileSync, statSync, writeFileSync } from "fs";
 import { IncomingMessage, ServerResponse } from "http";
 import net from "net"
 import https from "https"
@@ -10,7 +10,7 @@ import { dataFile, mapObj, proxy, proxyServerConfig } from "./constants.js";
 import internal from "stream";
 import { TLSSocket } from "tls";
 
-const nfport = 6000;
+const nfport = 18000;
 
 
 //Converts a given set of Proxies into an object
@@ -64,9 +64,10 @@ if (cluster.isWorker) {
 
             const hostname = data
                 .split('Host: ')[1]?.split('\r\n')[0].split(":")[0];
+            console.warn(hostname + " requested")
             const result = proxies.get(hostname || "");
             let port = result != null ? result.port : nfport;
-            let host = result != null ? result.host : "localhost";
+            let host = result != null ? result.prxy : "localhost";
 
             //   Upgrade: websocket
             let server = net.createConnection({ host, port }, () => {
@@ -152,6 +153,19 @@ else {
     links.set("/modules/util.js", { dist: "dist/html/util.js", type: "text/javascript" });
     links.set("/css/index.css", { dist: "html/css/index.css", type: "text/css" });
     links.set("/license.txt", { dist: "LICENSE", type: "text/plain" });
+
+    http.createServer((req, res) => {
+        const link = links.get(req.url || "") || { dist: "proxy-404.html", type: "text/html" };
+        const stat = statSync(link.dist)
+        res.writeHead(200, {
+            'Content-Type': link.type,
+            'Content-Length': stat.size
+        });
+        var readStream = createReadStream(link.dist);
+        readStream.pipe(res);
+
+        //console.log(req.url)
+    }).listen(nfport);
     //Saves the proxies given to file
     function saveProxies() {
 

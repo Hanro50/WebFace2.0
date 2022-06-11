@@ -1,8 +1,8 @@
 import { ChildProcess, spawn } from "child_process";
 import { createHash, randomUUID } from "crypto";
 import { chmodSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "fs";
-import { tmpdir } from "os";
-import path, { join } from "path";
+import { homedir, tmpdir, userInfo } from "os";
+import path, { join, resolve } from "path";
 import { dataFile, mapObj, meta } from "./constants.js";
 import { app } from "./main.js";
 
@@ -114,7 +114,12 @@ function startTask(meta: meta): impTask {
             else respool = 0;
 
             chmodSync(meta.path, 0o775)
-            const pwd = existsSync(meta.pwd || "") ? meta.pwd : tmpdir();
+            let tempPWD = meta.pwd
+            if (tempPWD) {
+                if (tempPWD.startsWith("~")) tempPWD = join(homedir(), ...tempPWD.substring(1).split(/[/,\\]/g))
+                else tempPWD = resolve(tempPWD);
+            }
+            const pwd = tempPWD && existsSync(tempPWD) ? tempPWD : tmpdir(); console.log(tempPWD)
             console.log(`Using: "${pwd}"`)
             const c = (process.platform == "win32")
                 ? spawn("cmd", ["-c", path.resolve(meta.path)], { cwd: pwd })
