@@ -10,8 +10,8 @@ class inp {
         this.chkBox = input.type == "checkbox";
         if (this.chkBox)
         this.input.addEventListener('mousedown',() => saved = false);
-        
-        this.input.onkeydown = () => saved = false;
+        this.input.addEventListener('keydown',()=>saved = false);
+
     }
 
     getValue() {
@@ -63,11 +63,11 @@ strttn.onclick = async () => {
         window.location.href = `/api/scripts/${namein.value}/run`
 }
 async function save() {
-    if (namein.value.trim().length < 1 && !namein.disabled) {
+    if (namein.value.trim().length < 1 && !namein.readOnly) {
         alert("Please provide the a valid name for the script first");
         return false;
     }
-    namein.disabled = true;
+    namein.readOnly = true;
     const ret: any = { data: scrptin.value };
     inputs.forEach(e => {
         ret[e.getID()] = e.getValue();
@@ -82,7 +82,7 @@ async function save() {
     return svd;
 }
 async function del() {
-    if (namein.disabled) {
+    if (namein.readOnly) {
         const name = namein.value.length > 0 ? namein.value : `${Date.now()}.${(uuid4())}`;
         const r = await fetch(`/api/scripts/${name}`, { method: "DELETE" });
         if (r.ok)
@@ -96,7 +96,7 @@ async function del() {
 function clear() {
     buttons.style.display = "none";
     table.style.display = "";
-    namein.disabled = false;
+    namein.readOnly = false;
     scrptin.value = "";
     inputs.forEach(e => e.setDefault())
 }
@@ -104,10 +104,10 @@ function clear() {
 scrptin.onkeyup = () => {
     saved = false;
     if (scrptin.value.startsWith("#!")) {
-        runin.disabled = true;
+        runin.readOnly = true;
         runin.value = scrptin.value.includes("\n") ? scrptin.value.substring(2, scrptin.value.indexOf("\n")) : scrptin.value.substring(2);
     } else
-        runin.disabled = false;
+        runin.readOnly = false;
 }
 savebtn.onclick = save;
 delbtn.onclick = del;
@@ -118,7 +118,7 @@ async function load(index: string) {
     if (!obj) return;
     buttons.style.display = "none";
     table.style.display = "";
-    namein.disabled = true;
+    namein.readOnly = true;
     scrptin.value = await (await fetch(`/api/scripts/${obj.name}`)).text();
     inputs.forEach(e => {
         const val = obj as any;
@@ -170,3 +170,5 @@ const script = new URL(location.href).searchParams.get('script');
 if (script) {
     load(script);
 }
+
+window.onclick = ()=> console.log(namein)

@@ -50,41 +50,60 @@ if (cluster.isWorker) {
 
     function connection(client: internal.Duplex | TLSSocket) {
 
-        console.log('Client Connected To Proxy');
+        // console.log('Client Connected To Proxy');
         //@ts-ignore
-        console.log(client.encrypted)
+        //console.log(client.encrypted)
         client.once('data', (raw) => {
 
 
             const data = raw.toString() as string;
+            if (!data.split("\n")[0].includes('HTTP')) {
+                console.log('Data of rejected header->', data)
+                return client.end();
+            }
+
             const hostname = data
-                .split('Host: ')[1].split('\r\n')[0].split(":")[0];
+                .split('Host: ')[1]?.split('\r\n')[0].split(":")[0];
             const result = proxies.get(hostname || "");
             let port = result != null ? result.port : nfport;
             let host = result != null ? result.host : "localhost";
 
             //   Upgrade: websocket
             let server = net.createConnection({ host, port }, () => {
-                console.log('PROXY TO SERVER SET UP');
+                function end() {
+                    server.end();
+                    client.end();
+                    //Freeing the internal resources. Since node's Garbage collector isn't always fast enough for this
+                    server.destroy();
+                    client.destroy();
+                }
+                if (client.destroyed) { console.error("Client already dead!"); end() };
+                // console.log('PROXY TO SERVER SET UP');
 
+                client.on('end', () => end());
+                server.on('end', () => end());
+
+                client.on('error', (err) => {
+                    console.log('CLIENT TO PROXY ERROR');
+                    console.log(err);
+                    end();
+
+                });
+                server.on('error', (err) => {
+                    console.log('PROXY TO SERVER ERROR');
+                    console.log(err);
+                    end();
+                });
                 server.write(data);
                 // Piping the sockets
                 server.pipe(client);
                 client.pipe(server);
-                server.on('error', (err) => {
-                    console.log('PROXY TO SERVER ERROR');
-                    console.log(err);
-                });
-                client.on('end', () => server.end());
-                server.on('end', () => client.end());
 
-                client.on('error', () => server.end());
-                server.on('error', () => client.end());
             });
-            client.on('error', err => {
-                console.log('CLIENT TO PROXY ERROR');
-                console.log(err);
-            });
+            //client.on('error', err => {
+            //     console.log('CLIENT TO PROXY ERROR');
+            //     console.log(err);
+            // });
         });
     }
 

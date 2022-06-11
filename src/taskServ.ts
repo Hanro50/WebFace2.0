@@ -223,7 +223,7 @@ export class impTask implements infTask {
         line.split("\n").forEach(e => {
             const transmission = { code, line: typeof e == "object" ? JSON.stringify(e) : e };
             this.log.push(transmission);
-            while (this.log.length > 100) this.log.shift();
+            while (this.log.length > 500) this.log.shift();
             this.clients.forEach(e => {
                 try { e.send(JSON.stringify(transmission).toString()) } catch { e.close() }
             })
