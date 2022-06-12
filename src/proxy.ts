@@ -131,18 +131,6 @@ if (cluster.isWorker) {
             ca.push(readFileSync(e).toString());
         })
         let serv = https.createServer({ key, cert, ca }).listen(PSC.https.port);
-        serv.on('Connection', (raw) => {
-            const data = raw.toString() as string;
-            const hostname = data
-                .split('Host: ')[1].split('\r\n')[0].split(":")[0];
-            const result = proxies.get(hostname || "");
-            let port = result != null ? result.port : nfport;
-            let host = result != null ? result.host : "localhost";
-            //  if (data.indexOf("Upgrade: websocket") && client instanceof TLSSocket) {
-            console.log(data)
-
-            //    console.log("true")
-        })
         serv.on('secureConnection', connection)
 
     }
