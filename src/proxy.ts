@@ -49,63 +49,66 @@ if (cluster.isWorker) {
     })
 
     function connection(client: internal.Duplex | TLSSocket) {
+        try {
+            client.once('data', (raw) => {
 
-        // console.log('Client Connected To Proxy');
-        //@ts-ignore
-        //console.log(client.encrypted)
-        client.once('data', (raw) => {
-
-
-            const data = raw.toString() as string;
-            if (!data.split("\n")[0].includes('HTTP')) {
-                console.log('Data of rejected header->', data)
-                return client.end();
-            }
-
-            const hostname = data
-                .split('Host: ')[1]?.split('\r\n')[0].split(":")[0];
-            console.warn(hostname + " requested")
-            const result = proxies.get(hostname || "");
-            let port = result != null ? result.port : nfport;
-            let host = result != null ? result.prxy : "localhost";
-
-            //   Upgrade: websocket
-            let server = net.createConnection({ host, port }, () => {
-                function end() {
-                    server.end();
-                    client.end();
-                    //Freeing the internal resources. Since node's Garbage collector isn't always fast enough for this
-                    server.destroy();
-                    client.destroy();
+                const data = raw.toString() as string;
+                if (!data.split("\n")[0].includes('HTTP')) {
+                    console.log('Data of rejected header->', data)
+                    return client.end();
                 }
-                if (client.destroyed) { console.error("Client already dead!"); end() };
-                // console.log('PROXY TO SERVER SET UP');
 
-                client.on('end', () => end());
-                server.on('end', () => end());
+                const hostname = data
+                    .split('Host: ')[1]?.split('\r\n')[0].split(":")[0];
+                console.log(hostname + " requested")
+                const result = proxies.get(hostname || "");
+                let port = result != null ? result.port : nfport;
+                let host = result != null ? result.prxy : "localhost";
 
-                client.on('error', (err) => {
-                    console.log('CLIENT TO PROXY ERROR');
-                    console.log(err);
-                    end();
+                //   Upgrade: websocket
+                let server = net.createConnection({ host, port }, () => {
+                    function end() {
+                        server.end();
+                        client.end();
+                        //Freeing the internal resources. Since node's Garbage collector isn't always fast enough for this
+                        server.destroy();
+                        client.destroy();
+                    }
+                    try {
+                        if (client.destroyed) { console.error("Client already dead!"); end() };
+                        // console.log('PROXY TO SERVER SET UP');
 
+                        client.on('end', () => end());
+                        server.on('end', () => end());
+
+                        client.on('error', (err) => {
+                            console.log('CLIENT TO PROXY ERROR');
+                            console.log(err);
+                            end();
+
+                        });
+                        server.on('error', (err) => {
+                            console.log('PROXY TO SERVER ERROR');
+                            console.log(err);
+                            end();
+                        });
+                        server.write(data);
+                        // Piping the sockets
+                        server.pipe(client);
+                        client.pipe(server);
+                    } catch (e) {
+                        console.error("Connection crash!")
+                        console.trace(e);
+                        end();
+                    }
                 });
-                server.on('error', (err) => {
-                    console.log('PROXY TO SERVER ERROR');
-                    console.log(err);
-                    end();
-                });
-                server.write(data);
-                // Piping the sockets
-                server.pipe(client);
-                client.pipe(server);
-
             });
-            //client.on('error', err => {
-            //     console.log('CLIENT TO PROXY ERROR');
-            //     console.log(err);
-            // });
-        });
+        } catch (err) {
+            console.error("Connection crash!")
+            console.trace(err);
+            client.end()
+            client.destroy();
+        }
     }
 
     let PSC: proxyServerConfig = { http: { port: 5000 } };
