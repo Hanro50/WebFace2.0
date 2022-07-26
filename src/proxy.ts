@@ -50,8 +50,17 @@ if (cluster.isWorker) {
 
     function connection(client: internal.Duplex | TLSSocket) {
         try {
-            client.once('data', (raw) => {
 
+            client.once('data', (raw) => {
+                const chunks: string[] = [];
+                client.on("readable", () => {
+                    let chunk;
+                    // Use a loop to make sure we read all currently available data
+                    while (null !== (chunk = client.read())) {
+                        chunks.push(String(chunk));
+                    }
+
+                })
                 const data = raw.toString() as string;
                 if (!data.split("\n")[0].includes('HTTP')) {
                     console.log('Data of rejected header->', data)
@@ -60,19 +69,25 @@ if (cluster.isWorker) {
 
                 const hostname = data
                     .split('Host: ')[1]?.split('\r\n')[0].split(":")[0];
-                console.log(hostname + " requested")
+
                 const result = proxies.get(hostname || "");
                 let port = result != null ? result.port : nfport;
                 let host = result != null ? result.prxy : "localhost";
 
                 //   Upgrade: websocket
                 let server = net.createConnection({ host, port }, () => {
+                    let ended = false;
                     function end() {
-                        server.end();
+                        if (ended) return;
+                        ended = true;
+                        if (data.startsWith("POST"))
+                            console.log("END \n%s\n_", data)
                         client.end();
+                        server.end();
+
                         //Freeing the internal resources. Since node's Garbage collector isn't always fast enough for this
-                        server.destroy();
                         client.destroy();
+                        server.destroy();
                     }
                     try {
                         if (client.destroyed) { console.error("Client already dead!"); end() };
@@ -92,15 +107,19 @@ if (cluster.isWorker) {
                             console.log(err);
                             end();
                         });
-                        server.write(data);
-                        // Piping the sockets
-                        server.pipe(client);
-                        client.pipe(server);
+                        server.write(data, () => {
+                            client.pipe(server, { end: true });
+                            server.pipe(client, { end: true });
+                        });
+                        chunks.forEach(e => server.write(e));
+
+                        client.uncork()
                     } catch (e) {
                         console.error("Connection crash!")
                         console.trace(e);
                         end();
                     }
+
                 });
             });
         } catch (err) {
