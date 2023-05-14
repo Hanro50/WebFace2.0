@@ -4,7 +4,9 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -w"
+    "build": "tsc -w",
+    "deploy": "tsc",
+    "dev":"node --stack-trace-limit=1000 ."
   },
   "author": "",
   "license": "ISC",
