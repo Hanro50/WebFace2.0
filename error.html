@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        @keyframes fade_in_page {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+                size: 1;
+            }
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            background-color: #171717;
+            display: flex;
+            height: calc(100% - 16px);
+            flex-direction: column;
+            align-items: center;
+            color: azure;
+            animation-duration: 0.5s;
+            animation-delay: 0s;
+            animation-name: fade_in_page;
+            transform: display 0s !important;
+            font-family: sans-serif;
+        }
+
+        h1 {
+            font-size: xx-large;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        hr {
+            width: 95%;
+        }
+
+        .button:hover {
+            background-color: #202020;
+        }
+
+        .button,
+        .label {
+            transition-duration: 0.5s;
+            background-color: #272727;
+            width: 80%;
+            margin-bottom: 10px;
+            display: flex;
+
+            justify-content: center;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: large;
+            font-style: bold;
+            font-weight: bold;
+            border: 2px solid #202020;
+            transition: all 0s, background-color 0.5s, transform 0.5s !important;
+            flex-direction: column;
+            align-items: center;
+            max-width: 600px;
+        }
+
+        .label {
+            pointer-events: none;
+        }
+
+        .button {
+            cursor: pointer;
+        }
+
+        h6 {
+            margin: 0;
+        }
+
+        .button:hover {
+            background-color: #555;
+            border: 2px solid #222;
+            transform: scale(1.1);
+        }
+    </style>
+
+</head>
+
+<body>
+  
+        <h1>Error {code} : {message}</h1>
+
+    <script>
+        let a = [...JSON.parse(`{json}`)];
+        function button(title, func) {
+            const div = document.createElement("div");
+            div.innerText = title;
+            div.onclick = func;
+            div.className = "button";
+            document.body.appendChild(div);
+            return div;
+        }
+        a.forEach(e => {
+            button(`${location.protocol}//${e.host}/`, () => location.href = `${location.protocol}//${e.host}:${location.port}/`)
+        })
+
+
+    </script>
+</body>
+
+
+</html>
